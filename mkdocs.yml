@@ -46,6 +46,7 @@ markdown_extensions:
 
 nav:
   - Home: index.md
+  - Glossary: glossary.md
   - Tools:
       - Sierra:
           - Bulk Holds:
@@ -55,3 +56,5 @@ nav:
               - Reference: tools/sierra/bulk-holds/reference.md
               - Explanation: tools/sierra/bulk-holds/explanation.md
               - At CHPL: tools/sierra/bulk-holds/at-chpl.md
+  - About:
+      - Roadmap: about/roadmap.md
