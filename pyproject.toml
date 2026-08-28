@@ -1,0 +1,17 @@
+[project]
+name = "ils-toolkit"
+version = "0.1.0"
+description = "The ILS Toolkit — documentation for library ILS tools"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = []
+
+[project.optional-dependencies]
+docs = [
+    "mkdocs-material>=9.5,<10.0",
+]
+
+# This repo ships documentation, not a Python package. Without this, uv tries to
+# build and install the project itself and the sync fails.
+[tool.uv]
+package = false
