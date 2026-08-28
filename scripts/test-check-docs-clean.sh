@@ -185,8 +185,8 @@ must_fail "personal address"      "ray\.voelker"    "written by ray.voelker for 
 must_fail "internal service host" "plch\.net"       "browse to ils-reports.plch.net/bulk-holds/"
 must_fail "internal domain"       "plch\.net"       "any host under plch.net is internal"
 must_fail "staff email"           '[a-z0-9._%+-]+@chpl\.org' "email a.librarian@chpl.org for access"
-must_fail "real item barcode"     "item-barcode shape found" "| A000000000097 | dc |" other
-must_fail "other real barcode"    "item-barcode shape found" "the item scanned as A000000000098" other
+must_fail "barcode shape (non-reserved)"       "item-barcode shape found" "| A000000000097 | dc |" other
+must_fail "barcode shape (non-reserved, alt)"  "item-barcode shape found" "the item scanned as A000000000098" other
 must_fail "Sierra record number"  '\.[bijopv][0-9]{6,7}[0-9xa]' "the item record is .i12345678"
 
 # --- Meta-check: DENYLIST <-> control coverage, mechanically, both directions.

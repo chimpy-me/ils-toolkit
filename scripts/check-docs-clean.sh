@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Fail if a token that must never be public appears in the docs or the built site.
-# Usage: check-docs-clean.sh [DIR ...]   (defaults to docs/)
+# Usage: check-docs-clean.sh [PATH ...]   (defaults to docs/; PATH may be a file or a directory)
 #
 # Adapted from sierra-ils-utils @ 3de20e9. The DENYLIST is DELIBERATELY DIFFERENT:
 # that site is fully anonymised, this one names the institution on purpose
@@ -19,12 +19,12 @@ else
   TARGETS=("$ROOT/docs")
 fi
 
-# Fail closed: a missing target directory is an error, not a silent pass —
-# otherwise grep's "no such file" (exit 2) reads as "no match", and the guard
-# would wrongly report the docs clean.
+# Fail closed: a missing target (file or directory) is an error, not a silent
+# pass — otherwise grep's "no such file" (exit 2) reads as "no match", and the
+# guard would wrongly report the docs clean.
 for target in "${TARGETS[@]}"; do
-  if [ ! -d "$target" ]; then
-    echo "ERROR: target directory does not exist: $target" >&2
+  if [ ! -e "$target" ]; then
+    echo "ERROR: target does not exist: $target" >&2
     exit 2
   fi
 done
