@@ -19,5 +19,5 @@ That is a known gap, not an oversight — see below.
 
 ## Later
 
-- More tools: web API endpoints, and agent skills.
+- More tools: web API endpoints, and tools built to be used directly by AI assistants.
 - Tools that are not tied to one ILS live directly under `Tools`, rather than under a vendor.

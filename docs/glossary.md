@@ -12,6 +12,10 @@ are built against.
 **CLI** — command-line interface. A tool you run by typing commands into a window and pressing
 Enter, rather than clicking through a web page or app. Bulk Holds ships as a CLI.
 
+**Bulk Holds web app** — a separate, browser-based tool used inside the library that does the same
+job as the Bulk Holds CLI documented here: placing holds from a list. It is a different program,
+not another name for this one, and it is not covered by this documentation set.
+
 **API** — application programming interface. The way one piece of software asks another to do
 something, over the network, without a person clicking through a screen. Sierra's API is what
 these tools talk to instead of the staff interface.
