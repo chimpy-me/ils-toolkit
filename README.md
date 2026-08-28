@@ -33,3 +33,7 @@ house conventions.
 
 This documentation and the tooling in this repository are licensed under the MIT Licence — see
 [LICENSE](LICENSE). Copyright is held by Ray Voelker.
+
+The licence and copyright holder were chosen deliberately by the repository's owner on
+2026-08-27, rather than inherited by default from a sibling project. MIT was chosen so the
+tooling is freely reusable by other libraries.
