@@ -46,3 +46,11 @@ markdown_extensions:
 
 nav:
   - Home: index.md
+  - Tools:
+      - Sierra:
+          - Bulk Holds:
+              - Overview: tools/sierra/bulk-holds/index.md
+              - Tutorial: tools/sierra/bulk-holds/tutorial.md
+              - How-to: tools/sierra/bulk-holds/how-to.md
+              - Reference: tools/sierra/bulk-holds/reference.md
+              - Explanation: tools/sierra/bulk-holds/explanation.md
