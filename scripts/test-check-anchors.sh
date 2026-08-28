@@ -77,6 +77,51 @@ else
   fails=$((fails + 1))
 fi
 
+build_href_fixture() {
+  # $1 = site dir, $2 = the literal href page-two uses to link to page one's
+  # heading. Same one/index.html as build_fixture; page two carries exactly
+  # one link so a failure is unambiguous about which shape broke.
+  local site="$1" href="$2"
+  mkdir -p "$site/one" "$site/two"
+  cat > "$site/one/index.html" <<HTML
+<html><body>
+<h2 id="why-you-can-be-refused">Why you can be refused</h2>
+</body></html>
+HTML
+  cat > "$site/two/index.html" <<HTML
+<html><body>
+<a href="${href}">link under test</a>
+</body></html>
+HTML
+}
+
+# Case 5: a root-relative href ("/one/#frag") carrying a VALID fragment ->
+# exit 0. Path.__truediv__ with an absolute right operand discards the left
+# side entirely, so naively doing (page.parent / "/one/") lands at the real
+# filesystem root instead of the site root -- a false dangling report on a
+# perfectly valid link.
+ROOTREL="$TMP/rootrel"
+build_href_fixture "$ROOTREL" "/one/#why-you-can-be-refused"
+if $CHECK "$ROOTREL" >/dev/null 2>&1; then
+  echo "PASS: root-relative href with a valid fragment resolves"
+else
+  echo "FAIL: root-relative href was rejected (absolute filesystem-root bug)" >&2
+  fails=$((fails + 1))
+fi
+
+# Case 6: a cross-page href carrying a QUERY STRING before the fragment
+# ("../one/?v=2#frag") on an otherwise-valid link -> exit 0. urldefrag alone
+# leaves the query string glued to the path portion, which then matches no
+# parsed page key.
+QUERY="$TMP/query"
+build_href_fixture "$QUERY" "../one/?v=2#why-you-can-be-refused"
+if $CHECK "$QUERY" >/dev/null 2>&1; then
+  echo "PASS: query string before the fragment does not break resolution"
+else
+  echo "FAIL: query string before the fragment broke resolution" >&2
+  fails=$((fails + 1))
+fi
+
 if [ "$fails" -ne 0 ]; then
   echo "check_anchors self-test FAILED ($fails case(s))" >&2
   exit 1

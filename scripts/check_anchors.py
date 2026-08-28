@@ -17,7 +17,7 @@ from __future__ import annotations
 import sys
 from html.parser import HTMLParser
 from pathlib import Path
-from urllib.parse import unquote, urldefrag, urlparse
+from urllib.parse import unquote, urlparse
 
 
 class _Page(HTMLParser):
@@ -68,12 +68,26 @@ def main(argv: list[str]) -> int:
             url = urlparse(href)
             if url.scheme or url.netloc:
                 continue  # external
-            target_path, frag = urldefrag(href)
-            frag = unquote(frag)
+            # Use urlparse's own separated components rather than hand-rolling
+            # a split -- url.path already excludes both the query string and
+            # the fragment, so a query string before the fragment (e.g.
+            # "../one/?v=2#target") no longer rides along into the path used
+            # for resolution.
+            target_path = url.path
+            frag = unquote(url.fragment)
             if not frag:
                 continue
             if target_path:
-                resolved = (page.parent / target_path).resolve()
+                if target_path.startswith("/"):
+                    # Site-root-relative, not filesystem-absolute: resolve
+                    # against the (already-resolved) site root. Path.__truediv__
+                    # with an absolute right operand discards the left side
+                    # entirely, so naively doing (page.parent / target_path)
+                    # would land at the real filesystem root instead of the
+                    # site-relative target.
+                    resolved = (site / target_path.lstrip("/")).resolve()
+                else:
+                    resolved = (page.parent / target_path).resolve()
                 if resolved.is_dir():
                     resolved = resolved / "index.html"
                 target = parsed.get(resolved)
