@@ -26,7 +26,7 @@ below.
 
 ## Who to ask for help
 
-The help desk queue, which routes to the ILS (integrated library system) team.
+The help desk queue, which routes to the ILS Team — the people who look after the integrated library system.
 
 ## Pickup location codes
 
