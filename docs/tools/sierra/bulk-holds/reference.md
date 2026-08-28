@@ -140,9 +140,9 @@ to type `yes`. Rejected — an expired or revoked key, the wrong secret, the
 wrong server — is only discovered when the first request goes out, which is
 *after* you type `yes`. Both exit `5`; neither places anything.
 
-**Test server caveat.** `sierra-test.cincinnatilibrary.org` is a periodic
-snapshot of production. An item that exists on production may not resolve on
-test. Full item validation only happens in a production dry run.
+**Test server caveat.** A Sierra test server is typically a periodic snapshot
+of production. An item that exists on production may not resolve on test.
+Full item validation only happens in a production dry run.
 
 ---
 
@@ -260,24 +260,20 @@ uv run python scripts/bulk_holds.py \
 
 Every option, exit code, and gate on this page applies identically.
 
-**Credentials from the environment.** `~/ils-reports-utils/.env` holds working
-`sierra-test.cincinnatilibrary.org` credentials:
-
-```bash
-set -a && . ~/ils-reports-utils/.env && set +a
-```
-
 For production, put the key and secret in the profile config (`chmod 600`) or
 keep a separate file and pass `--config`:
 
 ```json
 {
-  "sierra_api_base_url": "https://classic.cincinnatilibrary.org/iii/sierra-api/v6/",
+  "sierra_api_base_url": "https://<your-sierra-host>/iii/sierra-api/v6/",
   "sierra_api_key": "<PROD_KEY>",
   "sierra_api_secret": "<PROD_SECRET>",
   "verify_ssl": false
 }
 ```
+
+`verify_ssl` defaults to `false`; a deployment whose Sierra server presents a
+valid certificate should set it to `true`.
 
 **A test-server dry run checks parsing, not the batch.** Running the dry run
 against test first confirms the sheet parses and the per-row location map

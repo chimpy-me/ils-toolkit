@@ -188,6 +188,7 @@ must_fail "staff email"           '[a-z0-9._%+-]+@chpl\.org' "email a.librarian@
 must_fail "barcode shape (non-reserved)"       "item-barcode shape found" "| A000000000097 | dc |" other
 must_fail "barcode shape (non-reserved, alt)"  "item-barcode shape found" "the item scanned as A000000000098" other
 must_fail "Sierra record number"  '\.[bijopv][0-9]{6,7}[0-9xa]' "the item record is .i12345678"
+must_fail "internal test-server hostname" "sierra-test" "point --config at sierra-test.some-host.org for a dry run"
 
 # --- Meta-check: DENYLIST <-> control coverage, mechanically, both directions.
 check_denylist_coverage

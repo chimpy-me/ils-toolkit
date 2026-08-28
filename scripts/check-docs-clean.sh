@@ -42,6 +42,10 @@ DENYLIST=(
   '10\.110\.10\.'
   '[a-z0-9._%+-]+@chpl\.org'
   '\.[bijopv][0-9]{6,7}[0-9xa]'
+  # Internal test-server hostname. It resolves to an internal subnet already
+  # blocked above (10\.110\.10\.), so naming it publishes a blocked value in
+  # another encoding. Generic references to "a Sierra test server" are fine.
+  'sierra-test'
 )
 
 # Item barcodes are handled separately: the SHAPE is blocked, but three reserved
