@@ -62,6 +62,21 @@ else
   echo "PASS: missing site directory fails closed"
 fi
 
+# Case 4: the SAME good fixture as Case 1, but invoked with a RELATIVE site
+# path (cd into its parent, pass a bare dirname) instead of Case 1's absolute
+# one. This is the shape gates.sh/CI actually uses (the default site arg is
+# the relative "site"). A subshell keeps this from disturbing later cases'
+# cwd. $CHECK embeds $SCRIPT_DIR, which is already absolute, so it survives
+# the cd; `uv run` still finds an interpreter to run the stdlib-only script
+# with from outside any project tree, so no --project override is needed --
+# the site argument, not uv's project resolution, is the thing under test.
+if ( cd "$TMP" && $CHECK good >/dev/null 2>&1 ); then
+  echo "PASS: relative site path resolves the same as absolute"
+else
+  echo "FAIL: relative site path was rejected (absolute-only bug)" >&2
+  fails=$((fails + 1))
+fi
+
 if [ "$fails" -ne 0 ]; then
   echo "check_anchors self-test FAILED ($fails case(s))" >&2
   exit 1
