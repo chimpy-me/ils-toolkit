@@ -14,6 +14,13 @@
 # here without ever having been exercised. Reviewed 2026-08-27: this exact gap
 # let 'ils-reports\.plch\.net' sit dead in the denylist, fully subsumed by
 # 'plch\.net', with a control that proved nothing.
+#
+# That review found the gap by eye. It won't be found by eye next time: the
+# block below mechanically parses DENYLIST out of check-docs-clean.sh (never
+# a second copy of the list) and cross-checks it against the expected-leak
+# values the must_fail cases below actually register, in both directions —
+# a pattern with no control, and a control that names a pattern no longer in
+# the denylist. See check_denylist_coverage() near the bottom.
 set -uo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -28,6 +35,14 @@ TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
 fails=0
 
+# Populated by must_fail (kind="denylist", the default) with the exact
+# <expected_leak_substring> each control was given. This is the SAME string
+# already passed to must_fail below -- registering it here is not a second
+# copy of any pattern, just a second use of the one the call site already
+# has. check_denylist_coverage() compares this set against DENYLIST, parsed
+# fresh out of check-docs-clean.sh, so the two can never silently drift.
+DENYLIST_CONTROLS=()
+
 # must_pass <label> <content>
 must_pass() {
   local label="$1" content="$2" dir
@@ -41,14 +56,20 @@ must_pass() {
   fi
 }
 
-# must_fail <label> <expected_leak_substring> <content>
+# must_fail <label> <expected_leak_substring> <content> [kind]
 #
 # Asserts, and reports separately, which of three things failed:
 #   1. exit code is exactly 1 (not merely non-zero)
 #   2. output contains <expected_leak_substring>
 #   3. output contains exactly one line matching ^LEAK:
+#
+# [kind] defaults to "denylist": <expected_leak_substring> is registered into
+# DENYLIST_CONTROLS as a control for that DENYLIST entry in check-docs-clean.sh.
+# Pass kind="other" for a case that exercises a different mechanism (the
+# barcode-SHAPE check is separate from DENYLIST) so it is excluded from that
+# cross-check instead of showing up as an orphaned control.
 must_fail() {
-  local label="$1" expected="$2" content="$3" dir output rc
+  local label="$1" expected="$2" content="$3" kind="${4:-denylist}" dir output rc
   dir="$(mktemp -d "$TMP/fail.XXXXXX")"
   printf '%s\n' "$content" > "$dir/page.md"
 
@@ -79,6 +100,73 @@ must_fail() {
   else
     fails=$((fails + 1))
   fi
+
+  if [ "$kind" = "denylist" ]; then
+    DENYLIST_CONTROLS+=("$expected")
+  fi
+}
+
+# check_denylist_coverage: parses the DENYLIST array out of check-docs-clean.sh
+# (READ only -- never duplicated here) and fails, naming names, if:
+#   - a DENYLIST pattern has no control in DENYLIST_CONTROLS (dead pattern), or
+#   - a control names a pattern no longer in DENYLIST (orphaned control -- this
+#     is exactly how 'ils-reports\.plch\.net' survived subsumed and untested).
+check_denylist_coverage() {
+  local pattern control found
+  local -a actual_denylist dead orphaned
+
+  mapfile -t actual_denylist < <(
+    awk '/^DENYLIST=\(/{flag=1; next} flag && /^\)/{exit} flag' "$CHECK" \
+      | grep -v '^[[:space:]]*#' \
+      | sed -n "s/^[[:space:]]*'\(.*\)'[[:space:]]*\$/\1/p"
+  )
+
+  if [ "${#actual_denylist[@]}" -eq 0 ]; then
+    echo "FAIL: could not parse any DENYLIST entries out of $CHECK" >&2
+    fails=$((fails + 1))
+    return
+  fi
+
+  dead=()
+  for pattern in "${actual_denylist[@]}"; do
+    found=0
+    for control in "${DENYLIST_CONTROLS[@]}"; do
+      if [ "$control" = "$pattern" ]; then
+        found=1
+        break
+      fi
+    done
+    if [ "$found" -eq 0 ]; then
+      dead+=("$pattern")
+    fi
+  done
+
+  orphaned=()
+  for control in "${DENYLIST_CONTROLS[@]}"; do
+    found=0
+    for pattern in "${actual_denylist[@]}"; do
+      if [ "$control" = "$pattern" ]; then
+        found=1
+        break
+      fi
+    done
+    if [ "$found" -eq 0 ]; then
+      orphaned+=("$control")
+    fi
+  done
+
+  if [ "${#dead[@]}" -eq 0 ] && [ "${#orphaned[@]}" -eq 0 ]; then
+    echo "PASS: all ${#actual_denylist[@]} DENYLIST pattern(s) have a positive control, and every control names a live pattern"
+    return
+  fi
+
+  for pattern in "${dead[@]}"; do
+    echo "FAIL: DENYLIST pattern has no positive control: $pattern" >&2
+  done
+  for control in "${orphaned[@]}"; do
+    echo "FAIL: control names a pattern no longer in DENYLIST: $control" >&2
+  done
+  fails=$((fails + 1))
 }
 
 # --- The allow-list. D6 names the institution; if these red, the site cannot build.
@@ -97,9 +185,12 @@ must_fail "personal address"      "ray\.voelker"    "written by ray.voelker for 
 must_fail "internal service host" "plch\.net"       "browse to ils-reports.plch.net/bulk-holds/"
 must_fail "internal domain"       "plch\.net"       "any host under plch.net is internal"
 must_fail "staff email"           '[a-z0-9._%+-]+@chpl\.org' "email a.librarian@chpl.org for access"
-must_fail "real item barcode"     "item-barcode shape found" "| A000000000097 | dc |"
-must_fail "other real barcode"    "item-barcode shape found" "the item scanned as A000000000098"
+must_fail "real item barcode"     "item-barcode shape found" "| A000000000097 | dc |" other
+must_fail "other real barcode"    "item-barcode shape found" "the item scanned as A000000000098" other
 must_fail "Sierra record number"  '\.[bijopv][0-9]{6,7}[0-9xa]' "the item record is .i12345678"
+
+# --- Meta-check: DENYLIST <-> control coverage, mechanically, both directions.
+check_denylist_coverage
 
 # --- Fail closed: a missing target is an error, never a silent pass.
 if "$CHECK" "$TMP/does-not-exist" >/dev/null 2>&1; then

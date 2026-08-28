@@ -7,7 +7,10 @@
    not tied to an ILS goes directly under `docs/tools/<tool>/`. There is no `general/` bucket, on
    purpose: it would quietly become the largest folder.
 2. **Copy `docs/_template/` into it.** Six files: the five pages plus a deployment page, which you
-   rename to `at-<your site>.md`.
+   rename to `at-<your site>.md`. Renaming it means updating the link that points at it too —
+   `index.md`'s "Running it at a particular library?" line hardcodes `at-your-site.md`, and nothing
+   else will change it for you. `mkdocs build --strict` catches a missed rename, but only after
+   you've burned a cycle finding out why.
 3. **Add every page to `nav:` in `mkdocs.yml`.** A page not in the nav is a build failure, and the
    nav order is also the prev/next reading order.
 4. **Run the gates before you commit:** `bash scripts/gates.sh`.

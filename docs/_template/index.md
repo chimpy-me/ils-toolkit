@@ -15,6 +15,8 @@
 **Want to know why it works this way?** → **[Explanation](explanation.md)**
 
 **Running it at a particular library?** → **[At <site>](at-your-site.md)**
+<!-- Renaming at-your-site.md to at-<your site>.md? Update the filename in the
+     link on the line above to match, or the build will 404 on it. -->
 
 ## The one thing to know up front
 
