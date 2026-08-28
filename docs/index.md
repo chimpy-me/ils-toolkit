@@ -1,13 +1,11 @@
 # The ILS Toolkit
 
-Tools that libraries build on top of their **ILS** — the integrated library system, the software
-that holds the catalogue, the items, and the borrowing. Each tool here has a full set of
+Tools for libraries to make the most of their ILS — the integrated library system, the software at
+the center of any modern library, library system or consortium. Each tool here has a full set of
 documentation: something to learn from, recipes for real work, facts to look up, and background on
 why it works the way it does.
 
-The tools are built and used at the Cincinnati & Hamilton County Public Library, and written up so
-another library can pick them up. Where something is true only of one deployment, it lives on its
-own page — see [Bulk Holds → At CHPL](tools/sierra/bulk-holds/at-chpl.md) for the pattern.
+The tools are built and used at the Cincinnati & Hamilton County Public Library (CHPL).
 
 ## Which tool do you need?
 

@@ -4,8 +4,7 @@ By the end of this you will have run Bulk Holds once, on a spreadsheet you
 made yourself, and read the report it gives back.
 
 **Nothing you do here places a hold.** Every command on this page stops short
-of that, on purpose. You can get every step wrong and the worst that happens
-is an error message. That is the whole point of doing it this way first.
+of that, on purpose — the worst that can happen is an error message.
 
 Set aside about twenty minutes.
 
@@ -14,7 +13,7 @@ Set aside about twenty minutes.
 - The `bulk-holds` folder, unzipped somewhere in your Documents folder.
 - Three items you can physically pick up — off a cart, off a shelf, anything.
   You need to be able to read their barcodes.
-- The three Sierra settings you were given. Sierra is the library's catalogue
+- The three Sierra settings you were given. Sierra is the library's catalog
   system; the tool needs these to talk to it. You will put them in a file in
   step 2.
 
@@ -43,40 +42,65 @@ the right folder.
 > right-click, making sure you are inside the folder that contains
 > `bulk-holds.exe`.
 
-## Step 2 — let the tool ask for its settings
+## Step 2 — set this machine up
 
-Run the tool for the first time:
+Run the setup command. It places nothing, and you will run it twice:
 
 ```powershell
-.\bulk-holds.exe --spreadsheet "x.xlsx" --pickup-location dc
+.\bulk-holds.exe --init
 ```
 
-It will not run. It will tell you that it has written a settings file, and
-name the file's full path. This is expected — it is how the tool asks for its
-Sierra settings the first time.
+The first time, the tool has no Sierra settings yet. It writes a settings file
+for you, prints three paths, and says plainly that it could not check anything:
 
-Open the file it named. Fill in the three Sierra values you were given, save
-the file, and close it.
+```
+Credentials file: C:\Users\you\AppData\Roaming\CHPL\BulkHolds\config.json
+Run folders:      C:\Users\you\Documents\bulk-holds\runs
+Template:         C:\Users\you\Documents\bulk-holds\template.xlsx
+  Open it, type your barcodes, and SAVE AS a new name -- keep this one blank.
 
-That was your first success: you ran the tool, it told you what it needed, and
-you gave it. It will not ask again.
+Credentials are not filled in yet, so they were not checked.
+Edit C:\Users\you\AppData\Roaming\CHPL\BulkHolds\config.json, then run --init again.
+```
+
+Open the file named after **Credentials file**. Fill in the three Sierra values
+you were given, then save and close it:
+
+```json
+{
+  "sierra_api_base_url": "...",
+  "sierra_api_key": "...",
+  "sierra_api_secret": "..."
+}
+```
+
+Now run exactly the same command again:
+
+```powershell
+.\bulk-holds.exe --init
+```
+
+This time it has settings to check, so it asks Sierra who you are:
+
+```
+Credentials work.
+  Your operator fingerprint: <a short code>
+  Claimed account name:      <the name on your API key>
+```
+
+The tool can now talk to Sierra — proven before a spreadsheet is anywhere in
+the picture. It will not ask again.
+
+> The fingerprint is how your runs are attributed to you — it appears on every
+> card this machine creates. Send it to whoever issued your API key. It is
+> derived from the key and cannot be turned back into it.
 
 ## Step 3 — get a spreadsheet to work from
 
-Run the setup command. It places nothing:
+Step 2 printed a third path, the **Template**. That is the file you fill in
+now.
 
-```powershell
-bulk-holds --init
-```
-
-It prints three paths. The one you want is the template:
-
-```
-Template:         C:\Users\you\Documents\bulk-holds\template.xlsx
-  Open it, type your barcodes, and SAVE AS a new name -- keep this one blank.
-```
-
-Open that file. It has two headings and nothing else:
+Open it. It has two headings and nothing else:
 
 | A | B |
 |---|---|
@@ -84,7 +108,7 @@ Open that file. It has two headings and nothing else:
 
 Now fetch your three items. In column A, type each item's barcode on its own
 row. In column B, type `dc` on all three rows — that is a branch code, and for
-now it does not matter which one, because nothing is going to be placed.
+now it does not matter which one.
 
 You should end up with something like this:
 
@@ -102,11 +126,10 @@ You should end up with something like this:
 
 Then **File → Save As** and name it `practice.xlsx`, in the same folder.
 
-The save-as matters. `template.xlsx` is the blank you come back to next time,
-and this tutorial refers to it by name. If you save your barcodes into it
-instead, `--init` will notice and leave your work alone — but you will have a
-file called "template" with real barcodes in it, which is a confusing thing to
-find in six months.
+The save-as matters: `template.xlsx` is the blank you come back to next time.
+If you save barcodes into it instead, `--init` will notice and leave your work
+alone — but you will be left with a file named "template" full of real
+barcodes.
 
 > The headings matter more than the layout. The tool finds your barcodes by
 > looking for a heading with the word *Barcode* in it — so the columns can be
@@ -151,8 +174,7 @@ Pickup location routing:
 ```
 
 All three going to `dc`, because that is what you typed in column B. On a real
-batch this is the line you check hardest — it is the tool telling you what it
-thinks you asked for, in time to disagree.
+batch this is the line you check hardest.
 
 **Whether Sierra found your items:**
 
@@ -161,7 +183,7 @@ Items resolved: 3/3
 ```
 
 Three out of three. Because you picked items you were physically holding, they
-are all in the catalogue, so they all resolve.
+are all in the catalog, so they all resolve.
 
 **Which card it will use.**
 
@@ -205,5 +227,3 @@ hundred items produces; there is just more of it.
 When you have real work to do, go to the [how-to guides](how-to.md). That is
 where `--execute` appears — the step that actually places holds — and where
 the second half of the two-step sequence is explained.
-
-Delete `practice.xlsx` whenever you like. It has served its purpose.
