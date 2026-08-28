@@ -1,5 +1,9 @@
 # Bulk Holds — the CLI
 
+This is the Bulk Holds command-line tool, as used at the Cincinnati & Hamilton County Public
+Library. The four pages below are written for any Sierra site; **[At CHPL](at-chpl.md)** carries
+the details that are specific to one deployment.
+
 Bulk Holds places holds on a list of items, so they can be routed to branches
 through the holds system. You give it a spreadsheet; it does the rest.
 
