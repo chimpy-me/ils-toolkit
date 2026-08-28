@@ -11,6 +11,7 @@ procedure — see the [how-to guides](how-to.md) for those.
 - [Why one card per run](#why-one-card-per-run)
 - [Why the hold note matters](#why-the-hold-note-matters)
 - [Why runs are kept, and why they expire](#why-runs-are-kept-and-why-they-expire)
+- [Why the card records a fingerprint and not your name](#why-the-card-records-a-fingerprint-and-not-your-name)
 
 ---
 
@@ -45,7 +46,7 @@ the breakdown that runs**. That promise is only worth something if it is
 verified at the last possible instant. A check that runs before the prompt
 leaves a window — however short — in which the world can change between the
 check and the first hold. Someone re-saves the workbook while the prompt sits
-open. A cataloguer fixes a barcode overnight, on a run that was confirmed
+open. A cataloger fixes a barcode overnight, on a run that was confirmed
 before lunch.
 
 Moving the checks after the `yes` closes that window. The cost is that you can

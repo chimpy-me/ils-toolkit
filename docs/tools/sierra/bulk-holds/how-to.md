@@ -28,9 +28,9 @@ No location column is needed.
   --pickup-location dc
 ```
 
-This run does not use your own library card. It reserves a disposable card of
-its own for the batch and names it on the confirmation screen as
-`Card: BH-CLI-... (will be created)` — nothing exists in Sierra yet.
+The dry run reserves a disposable card for the batch — never your own library
+card ([why](explanation.md#what-the-card-is-doing)). Nothing exists in Sierra
+yet.
 
 **Step 2 — read the breakdown.** Check three things before going further:
 
@@ -73,16 +73,12 @@ Swap `--pickup-location dc` for `--location-column` in both steps:
   --location-column
 ```
 
-Then execute exactly as above, adding `--execute` and `--plan`. As with the
-single-branch recipe, this run reserves its own disposable card and names it
-on the confirmation screen; the card is not created until the execute step
-succeeds.
+Then execute exactly as above, adding `--execute` and `--plan`.
 
 **Rows with a blank location.** If you also pass `--pickup-location`, blank
 rows fall back to that code, and the dry run warns you how many did. If you do
 not pass it, blank rows get no hold at all — and the dry run warns you about
-that too. Read those warnings; they are the difference between items going
-somewhere unintended and going nowhere.
+that too. Read those warnings before executing.
 
 **If a branch count looks wrong,** the usual cause is stray whitespace or a
 formatting difference in a barcode cell, which stops that row matching what
@@ -103,7 +99,7 @@ saving it counts. Run the dry run again and execute *that* plan.
 **"plan 138, now 142"** (or any plan-versus-now comparison)
 
 Sierra's answer changed between your dry run and your execute: a barcode
-corrected overnight, an item added, deleted, or re-catalogued. The tool prints
+corrected overnight, an item added, deleted, or re-cataloged. The tool prints
 the counts branch by branch, and names the barcodes that differ. Run the dry
 run again, read the new breakdown, and execute that one.
 
@@ -113,26 +109,14 @@ run again, read the new breakdown, and execute that one.
 run that produced the plan. Compare the two commands character by character,
 or just re-run the dry run with the arguments you actually want.
 
-**"Sierra refused to create the container card"**
+**"Sierra refused to create the container card"** (or *"Could not reach
+Sierra…"*, or *"…returned no usable record id"*)
 
-Every other check passed, but the run's disposable card itself could not be
-created. This is exit `8`, and it has three forms, depending on where the
-attempt failed:
-
-- `Sierra refused to create the container card <barcode>` — Sierra rejected
-  the request outright, usually a permissions problem or a Sierra outage. No
-  card was created.
-- `Could not reach Sierra to create the container card` — the request never
-  got an answer (network, DNS, timeout). No card was created.
-- `Sierra accepted the card but returned no usable record id` — Sierra
-  answered success, but the tool could not read back the card's record id.
-  Unlike the other two, a card may already exist in Sierra under this run's
-  barcode.
-
-No holds are placed on any of these three. Whichever message you see, re-run
-the dry run and execute again. A retry always mints a fresh card under a new
-barcode — it never reuses or reaches back for the one from the failed
-attempt.
+Every other check passed, but the run's disposable card could not be created —
+exit `8`. No holds were placed. Re-run the dry run and execute again; a retry
+always mints a fresh card under a new barcode, never reusing the one from the
+failed attempt. What each message form implies is in
+[Reference → Exit codes](reference.md#exit-codes).
 
 **"stdin is not a terminal"**
 

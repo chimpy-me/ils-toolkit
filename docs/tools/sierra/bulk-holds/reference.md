@@ -68,12 +68,12 @@ per row (`lv`, `sh`, `mo`, …).
 
 ### How columns are matched
 
-Both headings are compared after normalising: lowercased, with everything that
+Both headings are compared after normalizing: lowercased, with everything that
 is not a letter or a digit removed. So `Barcode`, `BARCODE`, `Bar Code`,
 `bar_code` and `Bar-Code` are all the same heading.
 
 - **Barcode column** — matched as a *substring*. Any heading containing
-  `barcode` after normalising is accepted: `Barcode`, `Item Barcode`,
+  `barcode` after normalizing is accepted: `Barcode`, `Item Barcode`,
   `barcodes`. The first matching column wins.
 - **Pickup location column** — matched by *equality*, against whatever
   `--location-column` names (default `Branch Pickup Location`). It is not a
@@ -85,13 +85,9 @@ The dry run prints which headings it bound:
 Columns:  barcode <- "Item Barcode"   pickup location <- "Pick Location"
 ```
 
-Read that line. It is where the tool shows you its guess before it acts on it.
-
-**When more than one heading matches, the dry run says so.** The substring test
-means a sheet carrying both a patron and an item barcode column — an ordinary
-export shape — has two candidates, and the leftmost is bound. That choice is
-arbitrary, and a wrong bind surfaces much later as `Items resolved: 0/N`, which
-points at Sierra rather than at the header row. So every match is named:
+**When more than one heading matches, the dry run says so.** A sheet carrying
+both a patron and an item barcode column — an ordinary export shape — has two
+candidates; the leftmost is bound, and every match is named:
 
 ```
 Columns:  barcode <- "Patron Barcode"
@@ -99,17 +95,14 @@ WARNING: 2 columns match "barcode": 'Patron Barcode', 'Item Barcode'. Bound 'Pat
   If that is the wrong column, rename or remove the other one and run the dry run again.
 ```
 
-The warning does not stop the run. It discloses the ambiguity rather than
-gating on it: `Barcode` alongside `Barcode Notes` is a legitimate sheet on
-which the leftmost bind is the right one.
+The warning does not stop the run: `Barcode` alongside `Barcode Notes` is a
+legitimate sheet on which the leftmost bind is the right one.
 
 If a column is not found, the error names the headings your sheet actually has.
 
 **Ceiling: 2000 barcodes per sheet.** Item lookup is a single Sierra query with
-a hard limit of 2000 and no paging, so a longer sheet would come back
-truncated and the overflow would be indistinguishable from ordinary unresolved
-barcodes. A sheet over the limit is refused outright (exit `3`) rather than run
-short. Split into batches of 2000 or fewer.
+a hard limit of 2000 and no paging. A sheet over the limit is refused outright
+(exit `3`) rather than run short; split into batches of 2000 or fewer.
 
 **Location validation.** Every pickup-location code in play is checked against
 Sierra's own list during the dry run. An unknown code fails the dry run, writes
@@ -192,8 +185,6 @@ not by whether it exists:
 "Modified" is judged strictly, and errs towards leaving the file alone: a second
 worksheet, a renamed sheet, an added or reworded heading, a value anywhere below
 the header row, or a workbook that will not open at all — each counts as yours.
-Judging wrongly in that direction costs one extra timestamped file. Judging
-wrongly in the other direction would destroy barcodes somebody typed.
 
 ---
 
@@ -217,12 +208,11 @@ The card itself is not re-checked against Sierra, because there is nothing to
 look up: the plan's reserved barcode — the string named on the confirmation
 screen — is the exact barcode the execute step creates the card under.
 
-Identity is compared as well as totals, because one barcode becoming
-resolvable while another stops can leave every number intact and still be a
-different set of items.
+Barcode sets are compared as well as totals — see
+[Explanation → why identity is checked](explanation.md#why-identity-is-checked-not-just-totals).
 
-The spreadsheet-hash and Sierra-routing checks run **after** the typed `yes`.
-For the reasoning, see [Explanation](explanation.md).
+The spreadsheet-hash and Sierra-routing checks run **after** the typed `yes` —
+see [Explanation → why you can be refused after typing "yes"](explanation.md#why-you-can-be-refused-after-typing-yes).
 
 ---
 
