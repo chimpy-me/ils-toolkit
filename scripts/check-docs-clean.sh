@@ -35,7 +35,9 @@ DENYLIST=(
   'sqldaia'
   'qumulo'
   'ray\.voelker'
-  'ils-reports\.plch\.net'
+  # Subsumes the specific internal host ils-reports.plch.net that the spec named,
+  # plus every other host on the domain — do not re-add the narrower entry, it
+  # can never fire independently of this one.
   'plch\.net'
   '10\.110\.10\.'
   '[a-z0-9._%+-]+@chpl\.org'
