@@ -43,40 +43,66 @@ the right folder.
 > right-click, making sure you are inside the folder that contains
 > `bulk-holds.exe`.
 
-## Step 2 — let the tool ask for its settings
+## Step 2 — set this machine up
 
-Run the tool for the first time:
+Run the setup command. It places nothing, and you will run it twice:
 
 ```powershell
-.\bulk-holds.exe --spreadsheet "x.xlsx" --pickup-location dc
+.\bulk-holds.exe --init
 ```
 
-It will not run. It will tell you that it has written a settings file, and
-name the file's full path. This is expected — it is how the tool asks for its
-Sierra settings the first time.
+The first time, the tool has no Sierra settings yet. It writes a settings file
+for you, prints three paths, and says plainly that it could not check anything:
 
-Open the file it named. Fill in the three Sierra values you were given, save
-the file, and close it.
+```
+Credentials file: C:\Users\you\AppData\Roaming\CHPL\BulkHolds\config.json
+Run folders:      C:\Users\you\Documents\bulk-holds\runs
+Template:         C:\Users\you\Documents\bulk-holds\template.xlsx
+  Open it, type your barcodes, and SAVE AS a new name -- keep this one blank.
 
-That was your first success: you ran the tool, it told you what it needed, and
-you gave it. It will not ask again.
+Credentials are not filled in yet, so they were not checked.
+Edit C:\Users\you\AppData\Roaming\CHPL\BulkHolds\config.json, then run --init again.
+```
+
+Open the file named after **Credentials file**. Fill in the three Sierra values
+you were given, then save and close it:
+
+```json
+{
+  "sierra_api_base_url": "...",
+  "sierra_api_key": "...",
+  "sierra_api_secret": "..."
+}
+```
+
+Now run exactly the same command again:
+
+```powershell
+.\bulk-holds.exe --init
+```
+
+This time it has settings to check, so it asks Sierra who you are:
+
+```
+Credentials work.
+  Your operator fingerprint: <a short code>
+  Claimed account name:      <the name on your API key>
+```
+
+That is your first success, and it is the one worth having: you know the tool
+can talk to Sierra before a spreadsheet is anywhere in the picture. It will not
+ask again.
+
+> The fingerprint is how your runs are attributed to you — it appears on every
+> card this machine creates. Send it to whoever issued your API key. It is
+> derived from the key and cannot be turned back into it.
 
 ## Step 3 — get a spreadsheet to work from
 
-Run the setup command. It places nothing:
+Step 2 printed a third path, the **Template**. That is the file you fill in
+now.
 
-```powershell
-bulk-holds --init
-```
-
-It prints three paths. The one you want is the template:
-
-```
-Template:         C:\Users\you\Documents\bulk-holds\template.xlsx
-  Open it, type your barcodes, and SAVE AS a new name -- keep this one blank.
-```
-
-Open that file. It has two headings and nothing else:
+Open it. It has two headings and nothing else:
 
 | A | B |
 |---|---|
