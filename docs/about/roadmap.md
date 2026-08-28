@@ -21,3 +21,7 @@ That is a known gap, not an oversight — see below.
 
 - More tools: web API endpoints, and tools built to be used directly by AI assistants.
 - Tools that are not tied to one ILS live directly under `Tools`, rather than under a vendor.
+
+## Contributing
+
+Adding a tool of your own is documented in [Contributing](contributing.md).
